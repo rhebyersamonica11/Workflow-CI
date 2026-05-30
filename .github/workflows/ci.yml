@@ -1,0 +1,24 @@
+name: CI & Docker Build
+on: [push]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker Image
+        run: |
+          # Menggunakan fungsi MLflow untuk build docker
+          cd MLProject
+          mlflow models build-docker -m . -n loan-scoring-image
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Push to DockerHub
+        run: |
+          docker tag loan-scoring-image:latest ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring-image:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring-image:latest
