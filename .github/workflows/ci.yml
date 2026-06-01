@@ -18,9 +18,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run training
-        run: |
-          export PYTHONPATH=$PYTHONPATH:.
-          python modelling_tuning.py
+        run: python modelling_tuning.py
 
       # 2. Upload Model sebagai Artifact (Skilled)
       - name: Upload model artifact
