@@ -19,15 +19,14 @@ if ml_project_path not in sys.path:
 # Sekarang import dari folder MLProject akan berhasil
 from modelling import prepare_data
 
-# Tambahkan ini untuk membaca token dari env
+# --- PERBAIKAN: Inisialisasi Otomatis untuk GitHub Actions ---
+# DagsHub secara otomatis akan membaca DAGSHUB_USER_TOKEN dari environment variable
 token = os.environ.get("DAGSHUB_TOKEN")
-
 if token:
-    # Jika token ada (di GitHub Actions), gunakan token tersebut
-    dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True, token=token)
-else:
-    # Jika token tidak ada (lokal), gunakan cara biasa
-    dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True)
+    os.environ["DAGSHUB_USER_TOKEN"] = token
+
+# Inisialisasi DagsHub
+dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True)
 
 def run_experiment():
     # Persiapan Data dengan path yang fleksibel
@@ -67,7 +66,6 @@ def run_experiment():
             
             # 5. Artefak: Plot Feature Importance (PNG)
             plt.figure(figsize=(10, 6))
-            # Menggunakan X_train.columns langsung
             pd.Series(rf.feature_importances_, index=X_train.columns).sort_values().plot(kind='barh')
             plt.title(f"Feature Importance - {cfg['name']}")
             plt.tight_layout()
