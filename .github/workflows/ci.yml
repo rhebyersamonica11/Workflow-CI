@@ -17,9 +17,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # 1. Pelatihan Model (Basic)
       - name: Run training
-        run: python modelling_tuning.py
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          python modelling_tuning.py
 
       # 2. Upload Model sebagai Artifact (Skilled)
       - name: Upload model artifact
