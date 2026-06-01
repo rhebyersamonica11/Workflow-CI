@@ -15,7 +15,9 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          cd Membangun_model
+          pip install -r requirements.txt
 
       # 1. Pelatihan Model (Basic)
       - name: Run training
