@@ -1,19 +1,43 @@
-name: CI & Docker Build
+name: CI/CD Pipeline
+
 on: [push]
 
 jobs:
-  build-and-push:
+  train-and-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 1. Pelatihan Model (Basic)
+      - name: Run training
+        run: python modelling_tuning.py
+
+      # 2. Upload Model sebagai Artifact (Skilled)
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: trained-model
+          path: |
+            model/
+            model.pkl
+
+      # 3. Build & Push Docker Image (Advanced)
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: Build and Push
+
+      - name: Build and push
         run: |
-          # Perintah ini sekarang akan mencari Dockerfile di folder MLProject
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest MLProject/
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest
