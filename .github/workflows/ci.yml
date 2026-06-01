@@ -41,5 +41,5 @@ jobs:
 
       - name: Build and Push
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest MLProject/
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest
