@@ -19,9 +19,15 @@ if ml_project_path not in sys.path:
 # Sekarang import dari folder MLProject akan berhasil
 from modelling import prepare_data
 
-# 1. Inisialisasi DagsHub
-# Pastikan token/konfigurasi sudah diatur di Secrets GitHub jika menjalankan di CI
-dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True)
+# Tambahkan ini untuk membaca token dari env
+token = os.environ.get("DAGSHUB_TOKEN")
+
+if token:
+    # Jika token ada (di GitHub Actions), gunakan token tersebut
+    dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True, token=token)
+else:
+    # Jika token tidak ada (lokal), gunakan cara biasa
+    dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True)
 
 def run_experiment():
     # Persiapan Data dengan path yang fleksibel
