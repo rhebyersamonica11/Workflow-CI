@@ -5,12 +5,13 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy file requirements dan install dependencies
-COPY conda.yaml .
-RUN pip install mlflow scikit-learn pandas
+# Kita ambil dari folder Membangun_model sesuai struktur Anda
+COPY Membangun_model/requirements.txt .
+RUN pip install -r requirements.txt
 
-# Copy file modelling ke dalam container
-COPY modelling.py .
-COPY namadataset_preprocessing/loan_clean.csv ./namadataset_preprocessing/loan_clean.csv
+# Copy file modelling dan dataset
+COPY Membangun_model/modelling.py .
+COPY Membangun_model/namadataset_preprocessing/loan_clean.csv ./namadataset_preprocessing/loan_clean.csv
 
 # Jalankan skrip saat container mulai
 CMD ["python", "modelling.py"]
