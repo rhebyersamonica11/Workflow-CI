@@ -6,12 +6,12 @@ WORKDIR /app
 
 # Copy file requirements dan install dependencies
 # Kita ambil dari folder Membangun_model sesuai struktur Anda
-COPY Membangun_model/requirements.txt .
+COPY MLProject/requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy file modelling dan dataset
-COPY Membangun_model/modelling.py .
-COPY Membangun_model/namadataset_preprocessing/loan_clean.csv ./namadataset_preprocessing/loan_clean.csv
+COPY MLProject/modelling.py .
+COPY MLProject/namadataset_preprocessing/loan_clean.csv ./namadataset_preprocessing/loan_clean.csv
 
 # Jalankan skrip saat container mulai
 CMD ["python", "modelling.py"]

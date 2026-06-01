@@ -44,10 +44,6 @@ jobs:
 
       - name: Build and push
         run: |
-          # Periksa lokasi file terlebih dahulu untuk memastikan
-          ls -R 
-          
-          # Jika Dockerfile ada di folder MLProject, gunakan perintah ini:
+          # Kita masuk ke direktori MLProject untuk melakukan build
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest -f MLProject/Dockerfile .
-          
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest
