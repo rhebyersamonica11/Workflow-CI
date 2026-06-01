@@ -15,25 +15,22 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        # Kita pindah ke folder Membangun_model dulu baru install
-        run: |
-          cd Membangun_model
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
+      # 1. Pelatihan Model (Basic)
       - name: Run training
-        run: |
-          cd Membangun_model
-          python modelling_tuning.py
+        run: python modelling_tuning.py
 
+      # 2. Upload Model sebagai Artifact (Skilled)
       - name: Upload model artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: hasil-training-mlflow
+          name: trained-model
           path: |
-            Membangun_model/mlruns/
-            Membangun_model/*.txt
-            Membangun_model/*.png
+            model/
+            model.pkl
 
+      # 3. Build & Push Docker Image (Advanced)
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
@@ -42,5 +39,5 @@ jobs:
 
       - name: Build and push
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest -f Workflow_CI/Dockerfile .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest

@@ -1,0 +1,43 @@
+artifact_path: file:C:/SMSML_Rheby/Membangun_model/mlruns/1/models/m-12c71d2fb11c46328d2d55a3493f4fd9/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.13
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+is_signature_from_type_hint: false
+mlflow_version: 3.12.0
+model_id: m-12c71d2fb11c46328d2d55a3493f4fd9
+model_size_bytes: 1068
+model_uuid: m-12c71d2fb11c46328d2d55a3493f4fd9
+prompts: null
+run_id: d278e2be1a41495cbc1ea7ac2cefbdb7
+signature:
+  inputs: '[{"type": "double", "name": "0", "required": true}, {"type": "double",
+    "name": "1", "required": true}, {"type": "double", "name": "2", "required": true},
+    {"type": "double", "name": "3", "required": true}, {"type": "double", "name":
+    "4", "required": true}, {"type": "double", "name": "5", "required": true}, {"type":
+    "double", "name": "6", "required": true}, {"type": "double", "name": "7", "required":
+    true}, {"type": "double", "name": "8", "required": true}, {"type": "double", "name":
+    "9", "required": true}, {"type": "double", "name": "10", "required": true}, {"type":
+    "double", "name": "11", "required": true}, {"type": "double", "name": "12", "required":
+    true}, {"type": "double", "name": "13", "required": true}, {"type": "double",
+    "name": "14", "required": true}, {"type": "double", "name": "15", "required":
+    true}, {"type": "double", "name": "16", "required": true}, {"type": "double",
+    "name": "17", "required": true}, {"type": "double", "name": "18", "required":
+    true}, {"type": "double", "name": "19", "required": true}, {"type": "double",
+    "name": "20", "required": true}, {"type": "double", "name": "21", "required":
+    true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-06-01 13:02:34.338436'
