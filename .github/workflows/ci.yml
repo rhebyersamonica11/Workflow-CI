@@ -19,7 +19,7 @@ jobs:
 
       - name: Run training
         env:
-          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}  # Ini kunci agar token masuk ke environment
         run: python modelling_tuning.py
 
       # 2. Upload Model sebagai Artifact (Skilled)

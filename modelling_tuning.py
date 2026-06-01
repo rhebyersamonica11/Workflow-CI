@@ -1,6 +1,3 @@
-import dagshub
-import mlflow
-import mlflow.sklearn
 import os
 import sys
 import pandas as pd
@@ -8,78 +5,70 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
-# --- PERBAIKAN: Menambahkan folder MLProject ke sys.path ---
-# Mengambil path absolut dari direktori file ini
+# 1. Setup Path
 base_dir = os.path.dirname(os.path.abspath(__file__))
 ml_project_path = os.path.join(base_dir, 'MLProject')
-
 if ml_project_path not in sys.path:
     sys.path.append(ml_project_path)
 
-# Sekarang import dari folder MLProject akan berhasil
 from modelling import prepare_data
 
-# --- PERBAIKAN: Inisialisasi Otomatis untuk GitHub Actions ---
-# DagsHub secara otomatis akan membaca DAGSHUB_USER_TOKEN dari environment variable
+# 2. Setup Otentikasi DagsHub untuk CI/CD
+# Kita set variabel lingkungan yang dibaca oleh SDK DagsHub/MLflow
 token = os.environ.get("DAGSHUB_TOKEN")
 if token:
-    os.environ["DAGSHUB_USER_TOKEN"] = token
+    # Set kredensial agar MLflow dan DagsHub mengenalinya tanpa interaksi
+    os.environ["MLFLOW_TRACKING_USERNAME"] = "rhebyersamonica11"
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = token
+    # Menentukan URL tracking secara manual menghindari deteksi otomatis yang memicu OAuth
+    os.environ["MLFLOW_TRACKING_URI"] = f"https://dagshub.com/rhebyersamonica11/msml-loan-scoring.mlflow"
+else:
+    # Import dagshub hanya jika dijalankan secara lokal
+    import dagshub
+    dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True)
 
-# Inisialisasi DagsHub
-dagshub.init(repo_owner='rhebyersamonica11', repo_name='msml-loan-scoring', mlflow=True)
+import mlflow
+import mlflow.sklearn
 
 def run_experiment():
-    # Persiapan Data dengan path yang fleksibel
     data_path = os.path.join(base_dir, "namadataset_preprocessing", "loan_clean.csv")
     
-    # Validasi file ada sebelum training
     if not os.path.exists(data_path):
-        print(f"Error: File dataset tidak ditemukan di {data_path}")
+        print(f"Error: Dataset tidak ditemukan di {data_path}")
         return
 
     X_train, X_test, y_train, y_test = prepare_data(data_path)
     
     mlflow.set_experiment("Loan_Approval_Classification_Advance")
     
-    # Konfigurasi Hyperparameter Tuning
     configs = [
         {"name": "RF_Tuning_1", "n": 50, "depth": 5}, 
         {"name": "RF_Tuning_2", "n": 150, "depth": 12}
     ]
     
     for cfg in configs:
-        # 2. Mulai Eksperimen
         with mlflow.start_run(run_name=cfg["name"]):
             rf = RandomForestClassifier(n_estimators=cfg["n"], max_depth=cfg["depth"], random_state=42)
             rf.fit(X_train, y_train)
             
-            # 3. Manual Logging Metrik
             preds = rf.predict(X_test)
             acc = accuracy_score(y_test, preds)
             mlflow.log_metric("accuracy", acc)
             
-            # 4. Artefak: Laporan Klasifikasi (TXT)
+            # Log artefak
             report_path = "classification_report.txt"
             with open(report_path, "w") as f:
                 f.write(classification_report(y_test, preds))
             mlflow.log_artifact(report_path)
             
-            # 5. Artefak: Plot Feature Importance (PNG)
             plt.figure(figsize=(10, 6))
             pd.Series(rf.feature_importances_, index=X_train.columns).sort_values().plot(kind='barh')
-            plt.title(f"Feature Importance - {cfg['name']}")
-            plt.tight_layout()
             plt.savefig("feature_importance.png")
             mlflow.log_artifact("feature_importance.png")
-            plt.close() # Penting: Tutup plot untuk menghemat memori
+            plt.close()
             
-            # 6. Log Model
-            mlflow.sklearn.log_model(
-                sk_model=rf, 
-                artifact_path="model"
-            )
-            
-            print(f"[+] {cfg['name']} Selesai: Akurasi {acc:.4f}")
+            mlflow.sklearn.log_model(sk_model=rf, artifact_path="model")
+            print(f"[+] Eksperimen {cfg['name']} Selesai.")
 
 if __name__ == "__main__":
     run_experiment()
