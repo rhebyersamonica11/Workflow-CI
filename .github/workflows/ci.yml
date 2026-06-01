@@ -19,7 +19,7 @@ jobs:
 
       - name: Run training
         run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          export PYTHONPATH=$PYTHONPATH:.
           python modelling_tuning.py
 
       # 2. Upload Model sebagai Artifact (Skilled)
