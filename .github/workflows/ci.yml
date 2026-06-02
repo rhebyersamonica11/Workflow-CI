@@ -1,9 +1,15 @@
 name: CI & Docker Build
+
 on: [push]
 
 jobs:
-  train-and-build: # Satu job yang mencakup semua tahap
+  train-and-build:
     runs-on: ubuntu-latest
+    env:
+      # Gunakan DagsHub untuk pencatatan MLflow yang profesional
+      MLFLOW_TRACKING_URI: https://dagshub.com/YOUR_USERNAME/YOUR_REPO_NAME.mlflow
+      MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -11,16 +17,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install mlflow scikit-learn pandas
 
-      # 1. Kriteria BASIC: Training Otomatis
+      # 1. Kriteria BASIC: Training Otomatis menggunakan MLflow Project
       - name: Run training
-        env:
-          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
-        run: python modelling_tuning.py
+        run: |
+          cd MLProject
+          mlflow run . --no-conda
 
       # 2. Kriteria SKILLED: Upload Artifacts
       - name: Upload model artifact
@@ -29,17 +36,20 @@ jobs:
           name: hasil-training-mlflow
           path: |
             mlruns/
-            *.txt
-            *.png
 
-      # 3. Kriteria ADVANCED: Build & Push Docker
+      # 3. Kriteria ADVANCED: Build & Push Docker menggunakan MLflow
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push
+      - name: Build and Push Docker
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest .
+          # Build menggunakan perintah MLflow agar environment terjamin
+          # Pastikan model sudah terdaftar di registry dengan nama "LoanScoringModel"
+          mlflow models build-docker -m "models:/LoanScoringModel/latest" -n "loan-scoring-app"
+          
+          # Tag dan push ke Docker Hub
+          docker tag loan-scoring-app:latest ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/loan-scoring:latest
