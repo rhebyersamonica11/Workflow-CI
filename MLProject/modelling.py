@@ -13,7 +13,6 @@ def prepare_data(data_path):
     df = pd.read_csv(data_path)
     X = df.drop(columns=['loan_status'])
     y = df['loan_status']
-    # Membagi data training dan testing
     return train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
 def train_baseline_model(X_train, y_train):
@@ -22,12 +21,9 @@ def train_baseline_model(X_train, y_train):
     return model
 
 def main():
-    # PERBAIKAN PENTING: 
-    # Jika berjalan di GitHub Actions (terdeteksi env 'GITHUB_ACTIONS'), 
-    # simpan hasil secara lokal agar tidak mencari server 404.
-    if os.getenv("GITHUB_ACTIONS"):
-        tracking_uri = f"file://{os.path.abspath('./mlruns')}"
-        mlflow.set_tracking_uri(tracking_uri)
+    # Gunakan penyimpanan file lokal agar tidak perlu server
+    # 'file:./mlruns' adalah format URI lokal yang paling stabil
+    mlflow.set_tracking_uri("file:./mlruns")
     
     mlflow.set_experiment("Eksperimen_Loan_Scoring_Model")
     
@@ -42,11 +38,12 @@ def main():
         preds = model.predict(X_test)
         acc = accuracy_score(y_test, preds)
         
-        # Mendaftarkan model agar bisa di-build ke Docker nantinya
+        # PERBAIKAN: Hapus 'registered_model_name' 
+        # Karena di GitHub Actions (file based) kita tidak bisa mendaftarkan model ke registry tanpa database.
+        # Ini akan menghilangkan error 404/database.
         mlflow.sklearn.log_model(
             sk_model=model, 
-            artifact_path="model", 
-            registered_model_name="LoanScoringModel"
+            artifact_path="model"
         )
         
         print(f"Baseline run selesai. Akurasi: {acc:.4f}")
