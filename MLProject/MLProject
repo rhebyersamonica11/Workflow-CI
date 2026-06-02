@@ -1,8 +1,4 @@
 name: LoanScoringProject
-# env_manager: local memberitahu MLflow untuk menggunakan Python yang sudah ada
-# tanpa mencari atau membuat Conda environment.
-env_manager: local
-
 entry_points:
   main:
     command: "python modelling.py"
