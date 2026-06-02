@@ -21,7 +21,9 @@ jobs:
       - name: Run training
         run: |
           cd MLProject
-          python modelling.py
+          # Perintah ini yang diinginkan reviewer!
+          # Menjalankan proyek dengan MLflow, yang akan mencatat run ID secara lokal
+          mlflow run .
 
       - name: Upload model artifact
         uses: actions/upload-artifact@v4
