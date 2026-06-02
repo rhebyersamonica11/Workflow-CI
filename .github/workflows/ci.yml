@@ -22,8 +22,11 @@ jobs:
       - name: Run training
         run: |
           cd MLProject
-          # Perintah ini sekarang akan berjalan mulus tanpa error bash: activate
+          # Rename conda.yaml agar MLflow tidak memaksa pakai conda
+          mv conda.yaml conda.yaml.bak
           mlflow run .
+          # Kembalikan namanya (opsional)
+          mv conda.yaml.bak conda.yaml
 
       - name: Upload model artifact
         uses: actions/upload-artifact@v4
