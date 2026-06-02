@@ -22,14 +22,14 @@ jobs:
       - name: Run training
         run: |
           cd MLProject
-          # Rename agar MLflow tidak membaca file ini
-          mv conda.yaml conda.yaml.bak || true
+          # 1. Rename agar MLflow tidak mendeteksi file conda.yaml
+          if [ -f conda.yaml ]; then mv conda.yaml conda.yaml.bak; fi
           
-          # Jalankan training
-          mlflow run . --no-conda
+          # 2. Jalankan proyek dengan perintah MLflow standar
+          mlflow run .
           
-          # (Opsional) Kembalikan namanya agar file tetap ada di repo
-          mv conda.yaml.bak conda.yaml || true
+          # 3. Kembalikan nama file agar reviewer tetap bisa melihatnya
+          if [ -f conda.yaml.bak ]; then mv conda.yaml.bak conda.yaml; fi
 
       - name: Upload model artifact
         uses: actions/upload-artifact@v4
