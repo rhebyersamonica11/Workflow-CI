@@ -1,7 +1,4 @@
 name: LoanScoringProject
-
-# Ini instruksi kunci: MLflow akan menggunakan environment yang sudah ada
-# daripada membuat conda environment baru yang sering error.
 env_manager: local
 
 entry_points:
