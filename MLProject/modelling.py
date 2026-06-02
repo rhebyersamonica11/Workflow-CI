@@ -4,7 +4,7 @@ import mlflow
 import mlflow.sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score
 
 # Autologging mencatat parameter, metrik, dan model secara otomatis
 mlflow.sklearn.autolog()
@@ -22,9 +22,13 @@ def train_baseline_model(X_train, y_train):
     return model
 
 def main():
-    # PERBAIKAN: Hapus set_tracking_uri. 
-    # MLflow akan otomatis menggunakan variabel lingkungan (Environment Variables) 
-    # yang kita set di GitHub Actions nanti.
+    # PERBAIKAN PENTING: 
+    # Jika berjalan di GitHub Actions (terdeteksi env 'GITHUB_ACTIONS'), 
+    # simpan hasil secara lokal agar tidak mencari server 404.
+    if os.getenv("GITHUB_ACTIONS"):
+        tracking_uri = f"file://{os.path.abspath('./mlruns')}"
+        mlflow.set_tracking_uri(tracking_uri)
+    
     mlflow.set_experiment("Eksperimen_Loan_Scoring_Model")
     
     # Path dataset yang fleksibel
@@ -34,12 +38,11 @@ def main():
     with mlflow.start_run(run_name="Logistic_Regression_Baseline"):
         model = train_baseline_model(X_train, y_train)
         
-        # Evaluasi manual tetap bisa dilakukan, 
-        # namun autolog() sudah menangani pencatatan metrik lainnya
+        # Evaluasi
         preds = model.predict(X_test)
         acc = accuracy_score(y_test, preds)
         
-        # PENTING: Mendaftarkan model agar bisa di-build ke Docker nantinya
+        # Mendaftarkan model agar bisa di-build ke Docker nantinya
         mlflow.sklearn.log_model(
             sk_model=model, 
             artifact_path="model", 

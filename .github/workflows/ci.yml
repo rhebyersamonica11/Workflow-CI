@@ -23,7 +23,6 @@ jobs:
         run: |
           pip install mlflow scikit-learn pandas
 
-      # 1. Kriteria BASIC: Training Otomatis menggunakan MLflow Project
       - name: Run training
         run: |
           cd MLProject
