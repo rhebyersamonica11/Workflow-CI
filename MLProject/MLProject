@@ -1,5 +1,5 @@
 name: LoanScoringProject
-conda_env: conda.yaml
+env_manager: local
 entry_points:
   main:
     command: "python modelling.py"

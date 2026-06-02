@@ -27,7 +27,7 @@ jobs:
       - name: Run training
         run: |
           cd MLProject
-          mlflow run . --no-conda
+          mlflow run .
 
       # 2. Kriteria SKILLED: Upload Artifacts
       - name: Upload model artifact
