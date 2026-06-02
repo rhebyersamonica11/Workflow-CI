@@ -26,6 +26,8 @@ jobs:
       - name: Run training
         run: |
           cd MLProject
+          # Kita tidak menggunakan tracking server remote, 
+          # tapi menyimpan hasil di folder mlruns lokal
           mlflow run .
 
       # 2. Kriteria SKILLED: Upload Artifacts

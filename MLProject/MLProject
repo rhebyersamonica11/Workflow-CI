@@ -1,5 +1,7 @@
 name: LoanScoringProject
+# Gunakan env_manager: local agar tidak butuh Conda di GitHub Actions
 env_manager: local
+
 entry_points:
   main:
     command: "python modelling.py"
