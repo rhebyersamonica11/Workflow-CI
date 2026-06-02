@@ -16,13 +16,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # Pastikan semua library yang ada di conda.yaml sudah di-install di sini
           pip install mlflow scikit-learn pandas
 
       - name: Run training
         run: |
           cd MLProject
-          # Perintah ini yang diinginkan reviewer!
-          # Menjalankan proyek dengan MLflow, yang akan mencatat run ID secara lokal
+          # Perintah ini sekarang akan berjalan mulus tanpa error bash: activate
           mlflow run .
 
       - name: Upload model artifact
