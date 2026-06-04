@@ -17,7 +17,6 @@ def prepare_data(data_path):
     """
     Memuat dataset dan membagi menjadi train-test set.
     """
-
     df = pd.read_csv(data_path)
 
     X = df.drop(columns=["loan_status"])
@@ -36,7 +35,6 @@ def train_baseline_model(X_train, y_train):
     """
     Melatih model Logistic Regression baseline.
     """
-
     model = LogisticRegression(
         max_iter=1000,
         random_state=42
@@ -49,9 +47,6 @@ def train_baseline_model(X_train, y_train):
 
 def main():
 
-    # Membuat eksperimen MLflow
-    mlflow.set_experiment("Eksperimen_Loan_Scoring_Model")
-
     # Lokasi dataset hasil preprocessing
     data_path = os.path.join(
         os.path.dirname(__file__),
@@ -62,57 +57,55 @@ def main():
     # Split data
     X_train, X_test, y_train, y_test = prepare_data(data_path)
 
-    with mlflow.start_run(run_name="Logistic_Regression_Baseline"):
+    # ==========================
+    # Log Parameter
+    # ==========================
+    mlflow.log_param("model_type", "LogisticRegression")
+    mlflow.log_param("max_iter", 1000)
+    mlflow.log_param("random_state", 42)
+    mlflow.log_param("test_size", 0.2)
 
-        # ==========================
-        # Log parameter
-        # ==========================
-        mlflow.log_param("model_type", "LogisticRegression")
-        mlflow.log_param("max_iter", 1000)
-        mlflow.log_param("random_state", 42)
-        mlflow.log_param("test_size", 0.2)
+    # ==========================
+    # Training
+    # ==========================
+    model = train_baseline_model(X_train, y_train)
 
-        # ==========================
-        # Training
-        # ==========================
-        model = train_baseline_model(X_train, y_train)
+    # ==========================
+    # Prediksi
+    # ==========================
+    y_pred = model.predict(X_test)
 
-        # ==========================
-        # Prediksi
-        # ==========================
-        y_pred = model.predict(X_test)
+    # ==========================
+    # Evaluasi
+    # ==========================
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
 
-        # ==========================
-        # Evaluasi
-        # ==========================
-        accuracy = accuracy_score(y_test, y_pred)
-        precision = precision_score(y_test, y_pred)
-        recall = recall_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred)
+    # ==========================
+    # Log Metrics
+    # ==========================
+    mlflow.log_metric("accuracy", accuracy)
+    mlflow.log_metric("precision", precision)
+    mlflow.log_metric("recall", recall)
+    mlflow.log_metric("f1_score", f1)
 
-        # ==========================
-        # Log Metrics
-        # ==========================
-        mlflow.log_metric("accuracy", accuracy)
-        mlflow.log_metric("precision", precision)
-        mlflow.log_metric("recall", recall)
-        mlflow.log_metric("f1_score", f1)
+    # ==========================
+    # Simpan Model
+    # ==========================
+    mlflow.sklearn.log_model(
+        sk_model=model,
+        artifact_path="model"
+    )
 
-        # ==========================
-        # Simpan model
-        # ==========================
-        mlflow.sklearn.log_model(
-            sk_model=model,
-            artifact_path="model"
-        )
-
-        print("=" * 50)
-        print("TRAINING BERHASIL")
-        print(f"Accuracy : {accuracy:.4f}")
-        print(f"Precision: {precision:.4f}")
-        print(f"Recall   : {recall:.4f}")
-        print(f"F1 Score : {f1:.4f}")
-        print("=" * 50)
+    print("=" * 50)
+    print("TRAINING BERHASIL")
+    print(f"Accuracy : {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall   : {recall:.4f}")
+    print(f"F1 Score : {f1:.4f}")
+    print("=" * 50)
 
 
 if __name__ == "__main__":
