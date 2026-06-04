@@ -16,12 +16,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install mlflow
+          pip install -r requirements.txt
 
       - name: Run MLflow Project
         run: |
           cd MLProject
-          mlflow run .
+          mlflow run . --env-manager=local
       
       - name: Show mlruns location
         run: |
