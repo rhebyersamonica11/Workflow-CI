@@ -16,29 +16,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Pastikan semua library yang ada di conda.yaml sudah di-install di sini
-          pip install mlflow scikit-learn pandas
+          pip install -r requirements.txt
 
-      - name: Run training
+      - name: Run MLflow Project
         run: |
           cd MLProject
-          # 1. Rename file konfigurasi agar MLflow tidak "membaca" instruksi lingkungan apa pun
-          if [ -f conda.yaml ]; then mv conda.yaml conda.yaml.bak; fi
-          if [ -f python_env.yaml ]; then mv python_env.yaml python_env.yaml.bak; fi
-          
-          # 2. Paksa menjalankan dengan env_manager=local agar tidak memicu virtualenv
-          mlflow run . --env-manager=local
-          
-          # 3. Kembalikan nama file
-          if [ -f conda.yaml.bak ]; then mv conda.yaml.bak conda.yaml; fi
-          if [ -f python_env.yaml.bak ]; then mv python_env.yaml.bak python_env.yaml; fi
+          mlflow run .
+      
+      - name: Show mlruns location
+        run: |
+          find . -name mlruns -type d
 
       - name: Upload model artifact
         uses: actions/upload-artifact@v4
         with:
           name: hasil-training-mlflow
           path: |
-            MLProject/mlruns/
+            mlruns/
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
