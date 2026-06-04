@@ -1,0 +1,11 @@
+python: "3.11"
+
+build_dependencies:
+  - pip
+
+dependencies:
+  - mlflow==3.12.0
+  - pandas==2.3.2
+  - numpy==2.2.0
+  - scikit-learn==1.7.2
+  - joblib==1.5.2
